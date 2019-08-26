@@ -1,11 +1,12 @@
 #' Generates the phenotypic coordinates, in a \code{n}-dimension(s) phenotypic space,
-#' corresponding to a given fitness in the FGM. Use the inverse of
-#' the fitness function of an isotrope FGM (with parameters \code{n}, \code{maxfitness},
-#' \code{alpha}, \code{Q}) to compute the euclidian distance to the phenotypic
-#' optimum (\code{pheno_opt} -at the origin by default- at which the fitness =
-#' \code{maxfitness}). This distance is reported on the first coordinate and all
-#' the other \code{n}-1 coordinates are equal to the coordinates of the phenotypic
-#' optimum.
+#' corresponding to a given fitness using Fisher's Geometric Model (FGM, Fisher (1930)).
+#' Use the inverse of the fitness function of an isotrope FGM (with parameters
+#' \code{n}, \code{maxfitness}, \code{alpha}, \code{Q}) to compute the euclidian
+#' distance to the phenotypic optimum (\code{pheno_opt} -at the origin by default-
+#' at which the fitness = \code{maxfitness}). This distance is reported on the
+#' first coordinate and all the other \code{n}-1 coordinates are equal to the
+#' coordinates of the phenotypic optimum.
+#' See also \code{\link{ptof_fgm_iso}} for inverse function.
 #'
 #' @param fitness A real number. The fitness of the phenotype. Must be lower or
 #' equal to \code{maxfitness}.

@@ -1,5 +1,5 @@
 test_that("'ftop_fgm_iso' returns numeric coordinates", {
-  test_numeric(ftop_fgm_iso(fitness = 0, n = 3, maxfitness = 1, alpha = 1/2, Q = 2),
+  checkmate::expect_numeric(ftop_fgm_iso(fitness = 0, n = 3, maxfitness = 1, alpha = 1/2, Q = 2),
                finite = T, any.missing = F, len = 3, null.ok = F)
 })
 test_that("'ftop_fgm_iso' of different positive fitness returns expected coordinates", {

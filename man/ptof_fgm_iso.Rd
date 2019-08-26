@@ -25,15 +25,11 @@ fitness at the phenotypic optimum (\code{pheno_opt}).}
 function. Default=1/2 in the cannonical FGM with a quadratic fitness function.}
 
 \item{Q}{A strictly positive number. "Shape" of the fitness function. Default=2
-in the cannonical FGM with a quadratic fitness function.
-#' @param pheno_opt A vector of coordinates for the position of the phenotypic
+in the cannonical FGM with a quadratic fitness function.}
+
+\item{pheno_opt}{A vector of coordinates for the position of the phenotypic
 optimum at which the fitness is equal to \code{maxfitness}. Its length must be
 equal to the the number of column of phenotype.}
-
-\item{n}{A natural number. Number of dimensions of the phenotypic space.}
-
-\item{maxfitness}{A real number. Maximum fitness in the landscape reached at the
-phenotypic optimum.}
 }
 \value{
 A vector of fitnesses of length equal to the number of phenotype(s) (row(s)) in \code{phenotype}
@@ -50,5 +46,6 @@ See also \code{\link{ftop_fgm_iso}} for inverse function.
 \examples{
 #' @examples
 ptof_fgm_iso(phenotype = matrix(1:9, 3, 3, byrow = TRUE), maxfitness = 1)
-ptof_fgm_iso(phenotype = matrix(1:9, 3, 3, byrow = TRUE), maxfitness = 1, alpha = 1/2, Q = 2, pheno_opt = c(1,1,1))
+ptof_fgm_iso(phenotype = matrix(1:9, 3, 3, byrow = TRUE), maxfitness = 1,
+alpha = 1/2, Q = 2, pheno_opt = c(1,1,1))
 }

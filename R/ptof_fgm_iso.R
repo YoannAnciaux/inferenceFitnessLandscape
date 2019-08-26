@@ -9,23 +9,21 @@
 #' @param phenotype A vector, matrix of real number(s) (phenotypic
 #' coordinate(s)). For a matrix or a data.frame, the rows are phenotypes and the
 #' columns phenotypic dimensions.
-#' @param n A natural number. Number of dimensions of the phenotypic space.
 #' @param maxfitness A real number. The maximum fitness in the landscape. The
 #' fitness at the phenotypic optimum (\code{pheno_opt}).
-#' @param maxfitness A real number. Maximum fitness in the landscape reached at the
-#' phenotypic optimum.
 #' @param alpha A strictly positive real number. Scaling factor for the fitness
 #' function. Default=1/2 in the cannonical FGM with a quadratic fitness function.
 #' @param Q A strictly positive number. "Shape" of the fitness function. Default=2
 #' in the cannonical FGM with a quadratic fitness function.
-#' #' @param pheno_opt A vector of coordinates for the position of the phenotypic
+#' @param pheno_opt A vector of coordinates for the position of the phenotypic
 #' optimum at which the fitness is equal to \code{maxfitness}. Its length must be
 #' equal to the the number of column of phenotype.
 #' @return A vector of fitnesses of length equal to the number of phenotype(s) (row(s)) in \code{phenotype}
 #' @examples
 #' #' @examples
 #' ptof_fgm_iso(phenotype = matrix(1:9, 3, 3, byrow = TRUE), maxfitness = 1)
-#' ptof_fgm_iso(phenotype = matrix(1:9, 3, 3, byrow = TRUE), maxfitness = 1, alpha = 1/2, Q = 2, pheno_opt = c(1,1,1))
+#' ptof_fgm_iso(phenotype = matrix(1:9, 3, 3, byrow = TRUE), maxfitness = 1,
+#' alpha = 1/2, Q = 2, pheno_opt = c(1,1,1))
 #' @export
 ptof_fgm_iso <- function(phenotype, maxfitness, alpha = 1/2, Q = 2, pheno_opt = numeric(dim(phenotype)[2])) {
 

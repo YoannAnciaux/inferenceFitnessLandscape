@@ -12,7 +12,8 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    checkmate
+    checkmate,
+    MASS
 Suggests: 
     testthat (>= 2.1.0)
 RoxygenNote: 6.1.1

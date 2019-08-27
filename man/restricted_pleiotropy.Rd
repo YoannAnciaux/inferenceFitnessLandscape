@@ -12,8 +12,10 @@ restricted_pleiotropy(mutation, m)
 \item{mutation}{A matrix of real number. The rows are mutations and the columns
 phenotypic dimensions.}
 
-\item{m}{A natural number inferior to the number of colums of \code{mut}.
-Number of dimensions for which each mutation have a non-zero phenotypic effect.}
+\item{m}{A natural number inferior to \code{n}. Level of restricted pleiotropy
+which corresponds to the number of dimensions for which each mutation have a
+non-zero phenotypic effect. i.e. effects are equal to 0 in n-m dimensions.
+Default=\code{n} which corresponds to full pleiotropy.}
 }
 \value{
 A matrix of the same number of rows and columns as \code{mut} with

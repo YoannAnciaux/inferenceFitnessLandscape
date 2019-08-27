@@ -2,7 +2,7 @@
 #' with a variance of \code{lambda} per phenotypic dimension.
 #' Also applies any restricted pleiotropy of level \code{m}
 #'
-#' @param nb_mut A natural number. Number of selected mutations in the output.
+#' @param nb_mut A natural number. Number of mutations in the output.
 #' @param n A natural number. Number of dimensions of the phenotypic space in
 #' which the random mutations are drawn.
 #' @param lambda A positive real number. Variance of the effect of mutations on
@@ -46,12 +46,7 @@ generate_random_mutation <- function(nb_mut, n, lambda, m = n) {
   pheno_rand_mut_effect
 }
 #' Draw \code{nb_mut} mutation(s) effect(s) on phenotype of \code{n} dimensions
-#' @param n A natural number. Number of dimensions of the multivariate normal
-#' distribution from which the phenotypic effects of mutations are drawn
-#' @param nb_mut A natural number. Number of mutations for each of which a phenotypic
-#' effect is drawn.
-#' @param lambda A strictly positive real number. Variance of mutation effects on
-#' phenotype
+#' @inheritParams generate_random_mutation
 #' @return A matrix of \code{nb_mut} rows and \code{n} columns.
 random_mutation <- function(n, nb_mut, lambda) {
   #### Draw random mutation effects ####
@@ -63,8 +58,7 @@ random_mutation <- function(n, nb_mut, lambda) {
 #' random positions for each row of the matrix.
 #' @param mutation A matrix of real number. The rows are mutations and the columns
 #' phenotypic dimensions.
-#' @param m A natural number inferior to the number of colums of \code{mut}.
-#' Number of dimensions for which each mutation have a non-zero phenotypic effect.
+#' @inheritParams generate_random_mutation
 #' @return A matrix of the same number of rows and columns as \code{mut} with
 #' \code{m} random positions equal to zero in each rows
 restricted_pleiotropy <- function(mutation, m) {
@@ -72,6 +66,3 @@ restricted_pleiotropy <- function(mutation, m) {
   n <- dim(mutation)[2]
   t(apply(X = mutation, MARGIN = 1, FUN = function(mut) {mut[sample(c(1:n), n-m)] <- 0.0; mut}))
 }
-
-generate_random_mutation(nb_mut = 3, n = 3, lambda = 0.1)
-generate_random_mutation(nb_mut = 3, n = 3, lambda = 0.1, m = 1)

@@ -9,15 +9,7 @@
 #' @param phenotype A vector, matrix of real number(s) (phenotypic
 #' coordinate(s)). For a matrix or a data.frame, the rows are phenotypes and the
 #' columns phenotypic dimensions.
-#' @param maxfitness A real number. The maximum fitness in the landscape. The
-#' fitness at the phenotypic optimum (\code{pheno_opt}).
-#' @param alpha A strictly positive real number. Scaling factor for the fitness
-#' function. Default=1/2 in the cannonical FGM with a quadratic fitness function.
-#' @param Q A strictly positive number. "Shape" of the fitness function. Default=2
-#' in the cannonical FGM with a quadratic fitness function.
-#' @param pheno_opt A vector of coordinates for the position of the phenotypic
-#' optimum at which the fitness is equal to \code{maxfitness}. Its length must be
-#' equal to the the number of column of phenotype.
+#' @inheritParams ftop_fgm_iso
 #' @return A vector of fitnesses of length equal to the number of phenotype(s) (row(s)) in \code{phenotype}
 #' @examples
 #' #' @examples

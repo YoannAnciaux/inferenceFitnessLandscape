@@ -7,14 +7,13 @@
 random_mutation(n, nb_mut, lambda)
 }
 \arguments{
-\item{n}{A natural number. Number of dimensions of the multivariate normal
-distribution from which the phenotypic effects of mutations are drawn}
+\item{n}{A natural number. Number of dimensions of the phenotypic space in
+which the random mutations are drawn.}
 
-\item{nb_mut}{A natural number. Number of mutations for each of which a phenotypic
-effect is drawn.}
+\item{nb_mut}{A natural number. Number of mutations in the output.}
 
-\item{lambda}{A strictly positive real number. Variance of mutation effects on
-phenotype}
+\item{lambda}{A positive real number. Variance of the effect of mutations on
+phenotype per phenotypic dimension.}
 }
 \value{
 A matrix of \code{nb_mut} rows and \code{n} columns.

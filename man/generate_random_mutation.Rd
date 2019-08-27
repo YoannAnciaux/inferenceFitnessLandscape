@@ -9,7 +9,7 @@ Also applies any restricted pleiotropy of level \code{m}}
 generate_random_mutation(nb_mut, n, lambda, m = n)
 }
 \arguments{
-\item{nb_mut}{A natural number. Number of selected mutations in the output.}
+\item{nb_mut}{A natural number. Number of mutations in the output.}
 
 \item{n}{A natural number. Number of dimensions of the phenotypic space in
 which the random mutations are drawn.}

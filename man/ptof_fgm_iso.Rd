@@ -29,7 +29,7 @@ in the cannonical FGM with a quadratic fitness function.}
 
 \item{pheno_opt}{A vector of coordinates for the position of the phenotypic
 optimum at which the fitness is equal to \code{maxfitness}. Its length must be
-equal to the the number of column of phenotype.}
+equal to \code{n}. Default = numeric(n).}
 }
 \value{
 A vector of fitnesses of length equal to the number of phenotype(s) (row(s)) in \code{phenotype}

@@ -96,5 +96,5 @@ test_that("'generate_selected_mutation' of multiple mutants in multiple dimensio
                               FUN = function(p) {sum((pheno_opt - p)^2)^(1/2)})
   dist_to_opt_wt <- sum((pheno_opt - pheno_wt)^2)^(1/2)
   expect_true(all(dist_to_opt_mutant < dist_to_opt_wt))
-  expect_true(all(ptof_fgm_iso(phenotype = matrix(pheno_wt, nrow = 1, ncol = 3), maxfitness = 1) < ptof_fgm_iso(phenotype = ps, maxfitness = 1)))
+  expect_true(all(ptof_fgm_iso(phenotype = matrix(pheno_wt, nrow = 1, ncol = 3), maxfitness = 1, alpha = 1, Q = 0.5) < ptof_fgm_iso(phenotype = ps, maxfitness = 1,alpha = 1, Q = 0.5)))
 })

@@ -27,6 +27,7 @@ generate_selected_mutation <- function(nb_mut, n, lambda, maxfitness, pheno_wt, 
                               choices = names(as.list(match.call())[-1]))) {
     coll$push(paste0("Missing values for ", paste(setdiff(arg_required, arg_passed), collapse=", ")))
   }
+  checkmate::assert_count(nb_mut, na.ok = F, positive = T, null.ok = F, add = coll)
   checkmate::assert_numeric(pheno_wt, finite = T, any.missing = F, len = n,
                             null.ok = F, add = coll)
   checkmate::assert_count(nb_mut_rand, na.ok = F, positive = T, null.ok = F, add = coll)
@@ -72,5 +73,5 @@ add_mut_to_pheno <- function(pheno_mut_effect, pheno_wt){
 #' Computes the probability of escaping drift for a mutation in a clonal population,
 #' using its selection coefficient. For more info see Gerrish et al.(1998) Appendix I
 #' @param sel_coeff A vector of real numbers corresponfing to selectioncoefficients.
-#' @returns vetctor of probabilities.
+#' @return vetctor of probabilities.
 prob_esc_drift <- function(sel_coeff) {4 * sel_coeff / (1 + sel_coeff)^2}

@@ -10,6 +10,9 @@ prob_esc_drift(sel_coeff)
 \arguments{
 \item{sel_coeff}{A vector of real numbers corresponfing to selectioncoefficients.}
 }
+\value{
+vetctor of probabilities.
+}
 \description{
 Computes the probability of escaping drift for a mutation in a clonal population,
 using its selection coefficient. For more info see Gerrish et al.(1998) Appendix I

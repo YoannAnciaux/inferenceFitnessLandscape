@@ -4,8 +4,9 @@
 #' @param parameter A matrix of type numeric. Each row correspond to the arguments
 #'  in \code{simulation_model}. the order of the column must be the same as the arguments
 #'  in \code{simulation_model}.
-#' @param simulation_model A function or a function name. The function's arguments
-#' must cotrrespond to a row of \code{parameter} with same order.
+#' @param simulation_model A function or a character designing the \code{model_type}
+#' from \code{\link{generate_model}}. If a function is provided, its arguments must
+#' correspond to a row of \code{parameter} with same order.
 #' @param ncore A natural number. Number of cores used for the simulations. If
 #' \code{ncore} = 1 simulation_model is applied sequentially over the row of
 #' \code{parameter}. If \code{ncore} > 1 simulation_model is applied in parallel
@@ -16,9 +17,10 @@
 #' TRUE the results of the simulations are saved in two separated files with the
 #' suffixes "-simulation" and "-parameter". If FALSE parameters and simulations
 #' are saved in the same file with first columns for the parameters and the last
-#' for the corresponding simulations.
-#' @param ... Extra arguments which will be passed to \code{write.table} when an
-#' output is saved in a file. e.g. \code{sep}
+#' colums for the corresponding simulations.
+#' @param output_args List of arguments which will be passed to \code{\link[utils]{write.table}}
+#' if \code{file_output} = TRUE.
+#' @inheritParams generate_model
 #' @return A list of three elements. The first element is the matrix of \code{parameter}.
 #' If some parameters are unnamed, all the parameters are renamed to P1, P2...
 #' The second element is the matrix of simulations, in which each row is the result
@@ -31,23 +33,30 @@
 #' parameter <- cbind(1:10, seq(0.1, 1, 0.1))
 #' simulate_fl(parameter, simulation_model, ncore = 1)
 #' @export
-simulate_fl <- function(parameter, simulation_model, ncore = 1, file_output = NULL, multi_file = TRUE, ...) {
+simulate_fl <- function(parameter, simulation_model, empirical_fl = NULL, ncore = 1,
+                        file_output = NULL, multi_file = TRUE, fun_args = list(),
+                        output_args = list(), ...) {
 
   #### check arguments ####
   arg_required <- c("parameter", "simulation_model")
   arg_passed <- names(as.list(match.call())[-1])
-  coll <- checkmate::makeAssertCollection()
+  coll1 <- checkmate::makeAssertCollection()
   if (!checkmate::test_subset(x = arg_required,
                               choices = names(as.list(match.call())[-1]))) {
-    coll$push(paste0("Missing values for ", paste(setdiff(arg_required, arg_passed), collapse=", ")))
+    coll1$push(paste0("Missing values for ", paste(setdiff(arg_required, arg_passed), collapse=", ")))
   }
+  checkmate::reportAssertions(coll1)
+  coll <- checkmate::makeAssertCollection()
   checkmate::assert_matrix(parameter, any.missing = T, all.missing = T, min.rows = 1,
-                           add = coll)
+                           min.cols = 1, add = coll)
+  if (is.character(simulation_model)) {
+    simulation_model <- generate_model(empirical_fl = empirical_fl,
+                                       model_type = simulation_model,
+                                       fun_args = fun_args,
+                                       ...)
+  }
   checkmate::assert_function(simulation_model, nargs = dim(parameter)[2], null.ok = F,
                              add = coll)
-  if (!checkmate::test_function(simulation_model, nargs = dim(parameter)[2], null.ok = F)){
-    warning("See the vignette for more information on requirements for the simulation_model function")
-  }
   checkmate::assert_count(ncore, na.ok = F, positive = T, null.ok = F, add = coll)
   if (ncore > 1) {
     checkmate::assert_os(os = c("linux", "mac", "solaris"), add = coll)
@@ -80,10 +89,16 @@ simulate_fl <- function(parameter, simulation_model, ncore = 1, file_output = NU
   #### Write output either in two files with suffixes or in a single file and return a list####
   if(!is.null(file_output)) {
     if(multi_file) {
-      utils::write.table(simulation, file.path(dirname(file_output), paste0(basename(tools::file_path_sans_ext(file_output)), "-simulation.csv")), ...)
-      utils::write.table(parameter, file.path(dirname(file_output), paste0(basename(tools::file_path_sans_ext(file_output)), "-parameter.csv")), ...)
+      do.call(utils::write.table, append(list(simulation,
+                                              file.path(dirname(file_output), paste0(basename(tools::file_path_sans_ext(file_output)), "-simulation.csv"))),
+                                         output_args))
+      do.call(utils::write.table, append(list(parameter,
+                                              file.path(dirname(file_output), paste0(basename(tools::file_path_sans_ext(file_output)), "-parameter.csv"))),
+                                         output_args))
     } else {
-      utils::write.table(cbind(parameter, simulation), file_output, ...)
+      do.call(utils::write.table, append(list(cbind(parameter, simulation),
+                                              file_output),
+                                         output_args))
     }
   }
   list(parameter = parameter, simulation = simulation, system_time = timing)

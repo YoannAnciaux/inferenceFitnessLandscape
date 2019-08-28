@@ -30,11 +30,13 @@ ftop_fgm_iso <- function(fitness, n, maxfitness, alpha = 1/2, Q = 2, pheno_opt =
   #### check arguments ####
   arg_required <- c("fitness", "n", "maxfitness")
   arg_passed <- names(as.list(match.call())[-1])
-  coll <- checkmate::makeAssertCollection()
+  coll1 <- checkmate::makeAssertCollection()
   if (!checkmate::test_subset(x = arg_required,
                               choices = names(as.list(match.call())[-1]))) {
-    coll$push(paste0("Missing values for ", paste(setdiff(arg_required, arg_passed), collapse=", ")))
+    coll1$push(paste0("Missing values for ", paste(setdiff(arg_required, arg_passed), collapse=", ")))
   }
+  checkmate::reportAssertions(coll1)
+  coll <- checkmate::makeAssertCollection()
   checkmate::assert_number(maxfitness, na.ok = F, finite = T, null.ok = F,
                            add = coll)
   checkmate::assert_numeric(fitness, upper = maxfitness, finite = T,

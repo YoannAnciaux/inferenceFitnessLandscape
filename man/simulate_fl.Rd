@@ -5,16 +5,27 @@
 \title{Apply \code{simulation_model} to the rows of the matrix \code{parameter} either
 sequentially or in parallel (depends on \code{ncore}).}
 \usage{
-simulate_fl(parameter, simulation_model, ncore = 1, file_output = NULL,
-  multi_file = TRUE, ...)
+simulate_fl(parameter, simulation_model, empirical_fl = NULL,
+  ncore = 1, file_output = NULL, multi_file = TRUE,
+  fun_args = list(), output_args = list(), ...)
 }
 \arguments{
 \item{parameter}{A matrix of type numeric. Each row correspond to the arguments
 in \code{simulation_model}. the order of the column must be the same as the arguments
 in \code{simulation_model}.}
 
-\item{simulation_model}{A function or a function name. The function's arguments
-must cotrrespond to a row of \code{parameter} with same order.}
+\item{simulation_model}{A function or a character designing the \code{model_type}
+from \code{\link{generate_model}}. If a function is provided, its arguments must
+correspond to a row of \code{parameter} with same order.}
+
+\item{empirical_fl}{A matrix corresponding to an empirical fitness landscape.
+The first ncol-1 columns correspond to a genotype table. The rows correspond
+to different genotypes and the columns to the mutations that are considered for
+these genotypes. A genotype (at a certain row) has a given mutation when there
+is a 1 in the corresponding column.
+The column to of empirical_fl correspond to the fitness of each genotype. Only
+the fitness of the wt (i.e. the row in the genotype table with only zeros) is
+used.}
 
 \item{ncore}{A natural number. Number of cores used for the simulations. If
 \code{ncore} = 1 simulation_model is applied sequentially over the row of
@@ -28,10 +39,18 @@ no output file is created.}
 TRUE the results of the simulations are saved in two separated files with the
 suffixes "-simulation" and "-parameter". If FALSE parameters and simulations
 are saved in the same file with first columns for the parameters and the last
-for the corresponding simulations.}
+colums for the corresponding simulations.}
 
-\item{...}{Extra arguments which will be passed to \code{write.table} when an
-output is saved in a file. e.g. \code{sep}}
+\item{fun_args}{List of optionnal argument for certain \code{model_type}:
+\describe{
+  \item{nb_mut_rand}{for "fgmsmut" and "fgmcsmut". See \code{\link{generate_selected_mutation}} and \code{\link{generate_coselected_mutation}}}
+}}
+
+\item{output_args}{List of arguments which will be passed to \code{\link[utils]{write.table}}
+if \code{file_output} = TRUE.}
+
+\item{...}{Extra arguments which will be passed to \code{\link[utils]{read.table}} if an empirical
+fitness landscape is provided as a file in \code{empirical_fl}}
 }
 \value{
 A list of three elements. The first element is the matrix of \code{parameter}.

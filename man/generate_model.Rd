@@ -24,14 +24,25 @@ used.}
 \item{model_type}{A character corresponding to one of the following implemented
 models :
 \describe{
-  \item{"fgmrmut"}{random mutation in isotropic FGM. See \code{\link{generate_random_mutation}}}
-  \item{"fgmsmut"}{selected mutation in isotropic FGM. See \code{\link{generate_selected_mutation}}}
-  \item{"fgmcsmut"}{coselected mutation in isotropic FGM. See \code{\link{generate_coselected_mutation}}}
+  \item{"fgmrmut"}{random mutation in isotropic FGM. See \code{\link{model_fgmrmut}}}
+  \item{"fgmsmut"}{selected mutation in isotropic FGM. See \code{\link{model_fgmsmut}}}
+  \item{"fgmcsmut"}{coselected mutation in isotropic FGM. See \code{\link{model_fgmcsmut}}}
+  \item{"fgmrmut2env"}{random mutation in isotropic FGM with a refence environment and a environment. See \code{\link{model_fgmrmut_2env}}}
+  \item{"fgmsmut2env"}{selected mutation in isotropic FGM with a refence environment and a environment. See \code{\link{model_fgmsmut_2env}}}
+  \item{"fgmcsmut2env"}{coselected mutation in isotropic FGM with a refence environment and a environment. See \code{\link{model_fgmcsmut_2env}}}
 }}
 
-\item{fun_args}{List of optionnal argument for certain \code{model_type}:
+\item{fun_args}{List of argument for a given \code{model_type}.
+Argument *_ref are mandatory parameters for the environment of reference in models with two environments
 \describe{
-  \item{nb_mut_rand}{for "fgmsmut" and "fgmcsmut". See \code{\link{generate_selected_mutation}} and \code{\link{generate_coselected_mutation}}}
+  \item{nb_mut_rand}{optionnal for "fgmsmut", "fgmcsmut", "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+  \item{fitness_wt_ref}{mandatory for "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+  \item{n_ref}{mandatory for "fgmrmut2env", "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+  \item{lambda_ref}{mandatory for "fgmrmut2env", "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+  \item{maxfitness_ref}{mandatory for "fgmrmut2env", "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+  \item{alpha_ref}{mandatory for ""fgmrmut2env", fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+  \item{Q_ref}{mandatory for "fgmrmut2env", "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+  \item{m_ref}{mandatory for "fgmrmut2env", "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
 }}
 
 \item{...}{Extra arguments which will be passed to \code{\link[utils]{read.table}} if an empirical

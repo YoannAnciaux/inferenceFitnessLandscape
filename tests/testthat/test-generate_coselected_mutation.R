@@ -1,8 +1,8 @@
-test_that("'generate_selected_mutation' of multiple mutants in multiple dimensions returns multiple coselected mutant with increasing fitness higher than the wt", {
+test_that("'generate_coselected_mutation' of multiple mutants in multiple dimensions returns multiple coselected mutant with increasing fitness higher than the wt", {
   nb_mut <- 5
   n <- 3
   pheno_wt <- c(-1, numeric(n-1))
-  ps <- generate_coselected_mutation(nb_mut = nb_mut, n = n, lambda = 0.1, maxfitness = 1, pheno_wt = pheno_wt)
+  set.seed(1); ps <- generate_coselected_mutation(nb_mut = nb_mut, n = n, lambda = 0.1, maxfitness = 1, pheno_wt = pheno_wt)
   checkmate::expect_matrix(ps, mode = "numeric", all.missing = T, nrows = nb_mut, ncols = n, null.ok = F)
   pheno_opt <-numeric(n)
   pheno_mutant <- array(dim = dim(ps))
@@ -22,11 +22,11 @@ test_that("'generate_selected_mutation' of multiple mutants in multiple dimensio
   expect_true(all(fitness_mutant > ptof_fgm_iso(matrix(pheno_wt, 1, n), maxfitness = 1)))
   expect_equal(sort(fitness_mutant, decreasing = FALSE), fitness_mutant)
 })
-test_that("'generate_selected_mutation' of a single mutant in multiple dimensions returns a single selected mutant with fitness higher than the wt", {
+test_that("'generate_coselected_mutation' of a single mutant in multiple dimensions returns a single selected mutant with fitness higher than the wt", {
   nb_mut <- 1
   n <- 3
   pheno_wt <- c(-1, numeric(n-1))
-  ps <- generate_coselected_mutation(nb_mut = nb_mut, n = n, lambda = 0.1, maxfitness = 1, pheno_wt = pheno_wt)
+  set.seed(1); ps <- generate_coselected_mutation(nb_mut = nb_mut, n = n, lambda = 0.1, maxfitness = 1, pheno_wt = pheno_wt)
   checkmate::expect_matrix(ps, mode = "numeric", all.missing = T, nrows = nb_mut, ncols = n, null.ok = F)
   pheno_opt <-numeric(n)
   pheno_mutant <- array(dim = dim(ps))
@@ -46,11 +46,11 @@ test_that("'generate_selected_mutation' of a single mutant in multiple dimension
   expect_true(all(fitness_mutant > ptof_fgm_iso(matrix(pheno_wt, 1, n), maxfitness = 1)))
   expect_equal(sort(fitness_mutant, decreasing = FALSE), fitness_mutant)
 })
-test_that("'generate_selected_mutation' of multiple mutants in a single dimension returns multiple coselected mutant with increasing fitness higher than the wt", {
+test_that("'generate_coselected_mutation' of multiple mutants in a single dimension returns multiple coselected mutant with increasing fitness higher than the wt", {
   nb_mut <- 5
   n <- 1
   pheno_wt <- c(-1, numeric(n-1))
-  ps <- generate_coselected_mutation(nb_mut = nb_mut, n = n, lambda = 0.1, maxfitness = 1, pheno_wt = pheno_wt)
+  set.seed(1); ps <- generate_coselected_mutation(nb_mut = nb_mut, n = n, lambda = 0.1, maxfitness = 1, pheno_wt = pheno_wt)
   checkmate::expect_matrix(ps, mode = "numeric", all.missing = T, nrows = nb_mut, ncols = n, null.ok = F)
   pheno_opt <-numeric(n)
   pheno_mutant <- array(dim = dim(ps))
@@ -70,11 +70,11 @@ test_that("'generate_selected_mutation' of multiple mutants in a single dimensio
   expect_true(all(fitness_mutant > ptof_fgm_iso(matrix(pheno_wt, 1, n), maxfitness = 1)))
   expect_equal(sort(fitness_mutant, decreasing = FALSE), fitness_mutant)
 })
-test_that("'generate_selected_mutation' of a single mutant in a single dimension returns a single selected mutant with fitness higher than the wt", {
+test_that("'generate_coselected_mutation' of a single mutant in a single dimension returns a single selected mutant with fitness higher than the wt", {
   nb_mut <- 1
   n <- 1
   pheno_wt <- c(-1, numeric(n-1))
-  ps <- generate_coselected_mutation(nb_mut = nb_mut, n = n, lambda = 0.1, maxfitness = 1, pheno_wt = pheno_wt)
+  set.seed(1); ps <- generate_coselected_mutation(nb_mut = nb_mut, n = n, lambda = 0.1, maxfitness = 1, pheno_wt = pheno_wt)
   checkmate::expect_matrix(ps, mode = "numeric", all.missing = T, nrows = nb_mut, ncols = n, null.ok = F)
   pheno_opt <-numeric(n)
   pheno_mutant <- array(dim = dim(ps))
@@ -94,11 +94,11 @@ test_that("'generate_selected_mutation' of a single mutant in a single dimension
   expect_true(all(fitness_mutant > ptof_fgm_iso(matrix(pheno_wt, 1, n), maxfitness = 1)))
   expect_equal(sort(fitness_mutant, decreasing = FALSE), fitness_mutant)
 })
-test_that("'generate_selected_mutation' of multiple mutants in multiple dimensions with non default parameters returns multiple coselected mutant with increasing fitness higher than the wt", {
+test_that("'generate_coselected_mutation' of multiple mutants in multiple dimensions with non default parameters returns multiple coselected mutant with increasing fitness higher than the wt", {
   nb_mut <- 5
   n <- 3
   pheno_wt <- c(-1, numeric(n-1))
-  ps <- generate_coselected_mutation(nb_mut = nb_mut, n = n, lambda = 0.1, maxfitness = 1, pheno_wt = pheno_wt,
+  set.seed(1); ps <- generate_coselected_mutation(nb_mut = nb_mut, n = n, lambda = 0.1, maxfitness = 1, pheno_wt = pheno_wt,
                                      alpha = 1, Q = 0.5, m = 2, nb_mut_rand = 10^5)
   checkmate::expect_matrix(ps, mode = "numeric", all.missing = T, nrows = nb_mut, ncols = n, null.ok = F)
   pheno_opt <-numeric(n)

@@ -41,9 +41,17 @@ suffixes "-simulation" and "-parameter". If FALSE parameters and simulations
 are saved in the same file with first columns for the parameters and the last
 colums for the corresponding simulations.}
 
-\item{fun_args}{List of optionnal argument for certain \code{model_type}:
+\item{fun_args}{List of argument for a given \code{model_type}.
+Argument *_ref are mandatory parameters for the environment of reference in models with two environments
 \describe{
-  \item{nb_mut_rand}{for "fgmsmut" and "fgmcsmut". See \code{\link{generate_selected_mutation}} and \code{\link{generate_coselected_mutation}}}
+  \item{nb_mut_rand}{optionnal for "fgmsmut", "fgmcsmut", "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+  \item{fitness_wt_ref}{mandatory for "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+  \item{n_ref}{mandatory for "fgmrmut2env", "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+  \item{lambda_ref}{mandatory for "fgmrmut2env", "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+  \item{maxfitness_ref}{mandatory for "fgmrmut2env", "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+  \item{alpha_ref}{mandatory for ""fgmrmut2env", fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+  \item{Q_ref}{mandatory for "fgmrmut2env", "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+  \item{m_ref}{mandatory for "fgmrmut2env", "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
 }}
 
 \item{output_args}{List of arguments which will be passed to \code{\link[utils]{write.table}}

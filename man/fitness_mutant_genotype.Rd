@@ -2,20 +2,21 @@
 % Please edit documentation in R/generate_model.R
 \name{fitness_mutant_genotype}
 \alias{fitness_mutant_genotype}
-\title{Returns the fitnesses for each genotype in \code{geno_table} based on the phenotype
+\title{Returns the fitnesses for each genotype in \code{genotype_table} based on the phenotype
 of the wild_type (\code{pheno_wt}), the phenotype to fitness function in
 \code{fitness_fun} and the phenotypic mutation effects in \code{pheno_mut_effect}}
 \usage{
-fitness_mutant_genotype(pheno_mut_effect, pheno_wt, geno_table, maxfitness,
-  alpha = 1/2, Q = 2)
+fitness_mutant_genotype(pheno_mut_effect, pheno_wt, genotype_table,
+  maxfitness, alpha = 1/2, Q = 2,
+  pheno_opt = numeric(dim(pheno_mut_effect)[2]))
 }
 \arguments{
 \item{pheno_mut_effect}{A matrix of real numbers. Phenotypic effects of mutations
-by rows. The mutations in rows correspond to the columns of geno_table.}
+by rows. The mutations in rows correspond to the columns of genotype_table.}
 
 \item{pheno_wt}{A vector of real number. Phenotype of the wild type.}
 
-\item{geno_table}{A matrix of 0 and 1. The rows correspond to different genotypes
+\item{genotype_table}{A matrix of 0 and 1. The rows correspond to different genotypes
 and the columns to the mutations that are considered for these genotypes.
 A genotype (at a certain row) has a given mutation when there is a 1 in the
 corresponding column. A row with only zeros correspond to the wild type.}
@@ -28,20 +29,18 @@ function. Default=1/2 in the cannonical FGM with a quadratic fitness function.}
 
 \item{Q}{A strictly positive number. "Shape" of the fitness function. Default=2
 in the cannonical FGM with a quadratic fitness function.}
+
+\item{pheno_opt}{A vector of coordinates for the position of the phenotypic
+optimum at which the fitness is equal to \code{maxfitness}. Its length must be
+equal to \code{n}. Default = numeric(n).}
 }
 \value{
 A vector of real numbers. Each element is the fitness of the corresponding
-genotype in \code{geno_table}. They are in the same order as the rows of
-\code{geno_table}.
+genotype in \code{genotype_table}. They are in the same order as the rows of
+\code{genotype_table}.
 }
 \description{
-Returns the fitnesses for each genotype in \code{geno_table} based on the phenotype
+Returns the fitnesses for each genotype in \code{genotype_table} based on the phenotype
 of the wild_type (\code{pheno_wt}), the phenotype to fitness function in
 \code{fitness_fun} and the phenotypic mutation effects in \code{pheno_mut_effect}
-}
-\examples{
-geno_table <- as.matrix(expand.grid(rep(list(0:1), 3)))
-pheno_wt <- c(-1, 0)
-pheno_mut_effect <- generate_random_mutation(nb_mut = 3, n = 2, lambda = 0.1)
-fitness_mutant_genotype(pheno_mut_effect, pheno_wt, geno_table, maxfitness = 1)
 }

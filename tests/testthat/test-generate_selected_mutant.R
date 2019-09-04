@@ -47,7 +47,7 @@ test_that("'generate_selected_mutation' of multiple mutants in multiple dimensio
 })
 test_that("'generate_selected_mutation' of a single mutant in multiple dimensions returns a single selected mutant with fitness higher than the wt", {
   pheno_wt <- c(-1, 0, 0)
-  ps <- generate_selected_mutation(nb_mut = 1, n = 3, lambda = 0.1, maxfitness = 1, pheno_wt = pheno_wt)
+  set.seed(1); ps <- generate_selected_mutation(nb_mut = 1, n = 3, lambda = 0.1, maxfitness = 1, pheno_wt = pheno_wt)
   checkmate::expect_matrix(ps, mode = "numeric", all.missing = T, nrows = 1, ncols = 3, null.ok = F)
   pheno_opt <-numeric(3)
   pheno_mutant <- add_mut_to_pheno(ps, pheno_wt)
@@ -60,7 +60,7 @@ test_that("'generate_selected_mutation' of a single mutant in multiple dimension
 })
 test_that("'generate_selected_mutation' of multiple mutants in a single dimension returns multiple mutants with fitness higher than the wt", {
   pheno_wt <- c(-1)
-  ps <- generate_selected_mutation(nb_mut = 5, n = 1, lambda = 0.1, maxfitness = 1, pheno_wt = pheno_wt)
+  set.seed(1); ps <- generate_selected_mutation(nb_mut = 5, n = 1, lambda = 0.1, maxfitness = 1, pheno_wt = pheno_wt)
   checkmate::expect_matrix(ps, mode = "numeric", all.missing = T, nrows = 5, ncols = 1, null.ok = F)
   pheno_opt <-numeric(1)
   pheno_mutant <- add_mut_to_pheno(ps, pheno_wt)
@@ -73,7 +73,7 @@ test_that("'generate_selected_mutation' of multiple mutants in a single dimensio
 })
 test_that("'generate_selected_mutation' of a single mutant in a single dimension returns a single mutant with fitness higher than the wt", {
   pheno_wt <- c(-1)
-  ps <- generate_selected_mutation(nb_mut = 1, n = 1, lambda = 0.1, maxfitness = 1, pheno_wt = pheno_wt)
+  set.seed(1); ps <- generate_selected_mutation(nb_mut = 1, n = 1, lambda = 0.1, maxfitness = 1, pheno_wt = pheno_wt)
   checkmate::expect_matrix(ps, mode = "numeric", all.missing = T, nrows = 1, ncols = 1, null.ok = F)
   pheno_opt <-numeric(1)
   pheno_mutant <- add_mut_to_pheno(ps, pheno_wt)
@@ -86,7 +86,7 @@ test_that("'generate_selected_mutation' of a single mutant in a single dimension
 })
 test_that("'generate_selected_mutation' of multiple mutants in multiple dimensions with non default values returns multiple selected mutants with fitness higher than the wt", {
   pheno_wt <- c(-1, 0, 0)
-  ps <- generate_selected_mutation(nb_mut = 5, n = 3, lambda = 0.1, maxfitness = 1, pheno_wt = pheno_wt,
+  set.seed(1); ps <- generate_selected_mutation(nb_mut = 5, n = 3, lambda = 0.1, maxfitness = 1, pheno_wt = pheno_wt,
                                    alpha = 1, Q = 0.5, m = 3-1, nb_mut_rand = 10^5)
   checkmate::expect_matrix(ps, mode = "numeric", all.missing = T, nrows = 5, ncols = 3, null.ok = F)
   pheno_opt <-numeric(3)

@@ -16,13 +16,24 @@
 #' @param model_type A character corresponding to one of the following implemented
 #' models :
 #' \describe{
-#'   \item{"fgmrmut"}{random mutation in isotropic FGM. See \code{\link{generate_random_mutation}}}
-#'   \item{"fgmsmut"}{selected mutation in isotropic FGM. See \code{\link{generate_selected_mutation}}}
-#'   \item{"fgmcsmut"}{coselected mutation in isotropic FGM. See \code{\link{generate_coselected_mutation}}}
+#'   \item{"fgmrmut"}{random mutation in isotropic FGM. See \code{\link{model_fgmrmut}}}
+#'   \item{"fgmsmut"}{selected mutation in isotropic FGM. See \code{\link{model_fgmsmut}}}
+#'   \item{"fgmcsmut"}{coselected mutation in isotropic FGM. See \code{\link{model_fgmcsmut}}}
+#'   \item{"fgmrmut2env"}{random mutation in isotropic FGM with a refence environment and a environment. See \code{\link{model_fgmrmut_2env}}}
+#'   \item{"fgmsmut2env"}{selected mutation in isotropic FGM with a refence environment and a environment. See \code{\link{model_fgmsmut_2env}}}
+#'   \item{"fgmcsmut2env"}{coselected mutation in isotropic FGM with a refence environment and a environment. See \code{\link{model_fgmcsmut_2env}}}
 #' }
-#' @param fun_args List of optionnal argument for certain \code{model_type}:
+#' @param fun_args List of argument for a given \code{model_type}.
+#' Argument *_ref are mandatory parameters for the environment of reference in models with two environments
 #' \describe{
-#'   \item{nb_mut_rand}{for "fgmsmut" and "fgmcsmut". See \code{\link{generate_selected_mutation}} and \code{\link{generate_coselected_mutation}}}
+#'   \item{nb_mut_rand}{optionnal for "fgmsmut", "fgmcsmut", "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+#'   \item{fitness_wt_ref}{mandatory for "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+#'   \item{n_ref}{mandatory for "fgmrmut2env", "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+#'   \item{lambda_ref}{mandatory for "fgmrmut2env", "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+#'   \item{maxfitness_ref}{mandatory for "fgmrmut2env", "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+#'   \item{alpha_ref}{mandatory for ""fgmrmut2env", fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+#'   \item{Q_ref}{mandatory for "fgmrmut2env", "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
+#'   \item{m_ref}{mandatory for "fgmrmut2env", "fgmsmut2env" and "fgmcsmut2env". See \code{\link{model_fgmrmut_2env}}}
 #' }
 #' @param ... Extra arguments which will be passed to \code{\link[utils]{read.table}} if an empirical
 #' fitness landscape is provided as a file in \code{empirical_fl}
@@ -55,6 +66,9 @@ generate_model <- function(empirical_fl, model_type, fun_args = list(), ...) {
     coll1$push(paste0("Missing values for ", paste(setdiff(arg_required, arg_passed), collapse=", ")))
   }
   checkmate::reportAssertions(coll1)
+  force(empirical_fl)
+  force(model_type)
+  force(fun_args)
   coll <- checkmate::makeAssertCollection()
   if (is.character(empirical_fl)) {
     checkmate::assert_file_exists(empirical_fl, access = "r", add = coll)
@@ -68,12 +82,27 @@ generate_model <- function(empirical_fl, model_type, fun_args = list(), ...) {
                           .var.name = paste0(checkmate::vname(empirical_fl), " without the last column (fitness)"),
                           add = coll)
   }
-  checkmate::assert_choice(model_type, choices = c("fgmrmut", "fgmsmut", "fgmcsmut"),
+  checkmate::assert_choice(model_type, choices = c("fgmrmut", "fgmsmut", "fgmcsmut",
+                                                   "fgmrmut2env", "fgmsmut2env", "fgmcsmut2env"),
                            add = coll)
   #when adding new models check all the values from the two following assertions
-  checkmate::assert_list(fun_args, type = character(0), any.missing = F,
-                         max.len = 1, names = "unique", null.ok = F, add = coll)
-  checkmate::assert_subset(names(fun_args), choices = c("nb_mut_rand"), add = coll)
+  checkmate::assert_list(fun_args, any.missing = F, max.len = 8, names = "unique",
+                         null.ok = F, add = coll)
+
+  switch (model_type,
+          "fgmrmut" = checkmate::assert_list(fun_args, len = 0, add = coll),
+          "fgmsmut" = checkmate::assert_subset(names(fun_args), choices = c("nb_mut_rand"), add = coll),
+          "fgmcsmut" = checkmate::assert_subset(names(fun_args), choices = c("nb_mut_rand"), add = coll),
+          "fgmrmut2env" = checkmate::assert_subset(names(fun_args),
+                                                   choices = c("fitness_wt_ref", "n_ref", "lambda_ref", "maxfitness_ref", "alpha_ref", "Q_ref", "m_ref"),
+                                                   add = coll),
+          "fgmsmut2env" = checkmate::assert_subset(names(fun_args),
+                                                   choices = c("fitness_wt_ref", "n_ref", "lambda_ref", "maxfitness_ref", "alpha_ref", "Q_ref", "m_ref", "nb_mut_rand"),
+                                                   add = coll),
+          "fgmcsmut2env" = checkmate::assert_subset(names(fun_args),
+                                                    choices = c("fitness_wt_ref", "n_ref", "lambda_ref", "maxfitness_ref", "alpha_ref", "Q_ref", "m_ref", "nb_mut_rand"),
+                                                    add = coll)
+  )
   checkmate::reportAssertions(coll)
   nb_mut <- dim(empirical_fl)[2]-1
   genotype_table <- empirical_fl[, -(nb_mut + 1)]
@@ -81,72 +110,47 @@ generate_model <- function(empirical_fl, model_type, fun_args = list(), ...) {
   switch (model_type,
           # FGM random mutation 1 environment
           "fgmrmut" = function(n, lambda, maxfitness, alpha, Q, m) {
-            pheno_wt <- ftop_fgm_iso(fitness = empirical_fl[which(rowSums(genotype_table) == 0), nb_mut + 1],
-                                     n = n, maxfitness = maxfitness, alpha = alpha, Q = Q)
-            pheno_mut_effect <- generate_random_mutation(nb_mut = nb_mut,
-                                                         n = n,
-                                                         lambda = lambda,
-                                                         m = m)
-            fitness <- fitness_mutant_genotype(pheno_mut_effect = pheno_mut_effect,
-                                               pheno_wt = pheno_wt,
-                                               geno_table = genotype_table,
-                                               maxfitness = maxfitness,
-                                               alpha = alpha,
-                                               Q = Q)
-            fitness
+            model_fgmrmut(nb_mut = nb_mut, genotype_table = genotype_table,
+                          fitness_wt = empirical_fl[which(rowSums(genotype_table) == 0), nb_mut + 1],
+                          n = n, lambda = lambda, maxfitness = maxfitness,
+                          alpha = alpha, Q = Q, m = m)
           },
           # FGM selected mutation 1 environment
           "fgmsmut" = function(n, lambda, maxfitness, alpha, Q, m) {
-            pheno_wt <- ftop_fgm_iso(fitness = empirical_fl[which(rowSums(genotype_table) == 0), nb_mut + 1],
-                                     n = n, maxfitness = maxfitness, alpha = alpha, Q = Q)
-            pheno_mut_effect <- do.call(generate_selected_mutation, append(list(nb_mut = nb_mut,
-                                                                                n = n,
-                                                                                lambda = lambda,
-                                                                                maxfitness = maxfitness,
-                                                                                pheno_wt = pheno_wt,
-                                                                                alpha = alpha,
-                                                                                Q = Q,
-                                                                                m = m),
-                                                                           fun_args))
-
-            if(!anyNA(pheno_mut_effect)) {
-              fitness <- fitness_mutant_genotype(pheno_mut_effect = pheno_mut_effect,
-                                                 pheno_wt = pheno_wt,
-                                                 geno_table = genotype_table,
-                                                 maxfitness = maxfitness,
-                                                 alpha = alpha,
-                                                 Q = Q)
-            } else {
-              fitness <- array(dim = dim(empirical_fl)[1])
-            }
-            fitness
+            model_fgmsmut(nb_mut = nb_mut, genotype_table = genotype_table,
+                          fitness_wt = empirical_fl[which(rowSums(genotype_table) == 0), nb_mut + 1],
+                          n = n, lambda = lambda, maxfitness = maxfitness,
+                          alpha = alpha, Q = Q, m = m, fun_args = fun_args)
           },
           # FGM coselected mutation 1 environment
           "fgmcsmut" = function(n, lambda, maxfitness, alpha, Q, m) {
-            pheno_wt <- ftop_fgm_iso(fitness = empirical_fl[which(rowSums(genotype_table) == 0), nb_mut + 1],
-                                     n = n, maxfitness = maxfitness, alpha = alpha, Q = Q)
-            pheno_mut_effect <- do.call(generate_coselected_mutation, append(list(nb_mut = nb_mut,
-                                                                                  n = n,
-                                                                                  lambda = lambda,
-                                                                                  maxfitness = maxfitness,
-                                                                                  pheno_wt = pheno_wt,
-                                                                                  alpha = alpha,
-                                                                                  Q = Q,
-                                                                                  m = m),
-                                                                             fun_args))
-
-            if(!anyNA(pheno_mut_effect)) {
-              fitness <- fitness_mutant_genotype(pheno_mut_effect = pheno_mut_effect,
-                                                 pheno_wt = pheno_wt,
-                                                 geno_table = genotype_table,
-                                                 maxfitness = maxfitness,
-                                                 alpha = alpha,
-                                                 Q = Q)
-            } else {
-              fitness <- array(dim = dim(empirical_fl)[1])
-            }
-            fitness
+            model_fgmcsmut(nb_mut = nb_mut, genotype_table = genotype_table,
+                           fitness_wt = empirical_fl[which(rowSums(genotype_table) == 0), nb_mut + 1],
+                           n = n, lambda = lambda, maxfitness = maxfitness,
+                           alpha = alpha, Q = Q, m = m, fun_args = fun_args)
+          },
+          # FGM random mutation 2 environments
+          "fgmrmut2env" = function(lambda, maxfitness, alpha, Q, theta) {
+            model_fgmrmut_2env(nb_mut = nb_mut, genotype_table = genotype_table,
+                               fitness_wt_new_env = empirical_fl[which(rowSums(genotype_table) == 0), nb_mut + 1],
+                               lambda = lambda, maxfitness = maxfitness,
+                               alpha = alpha, Q = Q, theta = theta, fun_args = fun_args)
+          },
+          # FGM selected mutation 2 environments
+          "fgmsmut2env" = function(lambda, maxfitness, alpha, Q, theta) {
+            model_fgmsmut_2env(nb_mut = nb_mut, genotype_table = genotype_table,
+                               fitness_wt_new_env = empirical_fl[which(rowSums(genotype_table) == 0), nb_mut + 1],
+                                lambda = lambda, maxfitness = maxfitness,
+                                alpha = alpha, Q = Q, theta = theta, fun_args = fun_args)
+          },
+          # FGM coselected mutation 2 environments
+          "fgmcsmut2env" = function(lambda, maxfitness, alpha, Q, theta) {
+            model_fgmcsmut_2env(nb_mut = nb_mut, genotype_table = genotype_table,
+                                fitness_wt_new_env = empirical_fl[which(rowSums(genotype_table) == 0), nb_mut + 1],
+                                lambda = lambda, maxfitness = maxfitness,
+                                alpha = alpha, Q = Q, theta = theta, fun_args = fun_args)
           }
+
   )
 }
 #' Checkmate wrapper for argument checks. See \code{\link[checkmate]{makeAssertion}}
@@ -172,47 +176,407 @@ check_genotype_table <- function(x) {
   }
 }
 
-#' Returns the fitnesses for each genotype in \code{geno_table} based on the phenotype
+#' Returns the fitnesses for each genotype in \code{genotype_table} based on the phenotype
 #' of the wild_type (\code{pheno_wt}), the phenotype to fitness function in
 #' \code{fitness_fun} and the phenotypic mutation effects in \code{pheno_mut_effect}
 #'
 #' @param pheno_mut_effect A matrix of real numbers. Phenotypic effects of mutations
-#' by rows. The mutations in rows correspond to the columns of geno_table.
+#' by rows. The mutations in rows correspond to the columns of genotype_table.
 #' @param pheno_wt A vector of real number. Phenotype of the wild type.
-#' @param geno_table A matrix of 0 and 1. The rows correspond to different genotypes
+#' @param genotype_table A matrix of 0 and 1. The rows correspond to different genotypes
 #' and the columns to the mutations that are considered for these genotypes.
 #' A genotype (at a certain row) has a given mutation when there is a 1 in the
 #' corresponding column. A row with only zeros correspond to the wild type.
 #' @inheritParams ptof_fgm_iso
 #' @return A vector of real numbers. Each element is the fitness of the corresponding
-#' genotype in \code{geno_table}. They are in the same order as the rows of
-#' \code{geno_table}.
-#' @examples
-#' geno_table <- as.matrix(expand.grid(rep(list(0:1), 3)))
-#' pheno_wt <- c(-1, 0)
-#' pheno_mut_effect <- generate_random_mutation(nb_mut = 3, n = 2, lambda = 0.1)
-#' fitness_mutant_genotype(pheno_mut_effect, pheno_wt, geno_table, maxfitness = 1)
-#' @export
-fitness_mutant_genotype <- function(pheno_mut_effect, pheno_wt, geno_table, maxfitness, alpha = 1/2, Q = 2) {
+#' genotype in \code{genotype_table}. They are in the same order as the rows of
+#' \code{genotype_table}.
+fitness_mutant_genotype <- function(pheno_mut_effect, pheno_wt, genotype_table, maxfitness, alpha = 1/2, Q = 2, pheno_opt = numeric(dim(pheno_mut_effect)[2])) {
 
   #### check arguments ####
-  arg_required <- c("pheno_mut_effect", "pheno_wt", "geno_table", "maxfitness")
+  arg_required <- c("pheno_mut_effect", "pheno_wt", "genotype_table", "maxfitness")
   arg_passed <- names(as.list(match.call())[-1])
-  coll <- checkmate::makeAssertCollection()
+  coll1 <- checkmate::makeAssertCollection()
   if (!checkmate::test_subset(x = arg_required,
                               choices = names(as.list(match.call())[-1]))) {
-    coll$push(paste0("Missing values for ", paste(setdiff(arg_required, arg_passed), collapse=", ")))
+    coll1$push(paste0("Missing values for ", paste(setdiff(arg_required, arg_passed), collapse=", ")))
   }
-  checkmate::assert_matrix(geno_table, mode = "numeric", add = coll)
-  assert_genotype_table(geno_table, add = coll)
+  checkmate::reportAssertions(coll1)
+  coll <- checkmate::makeAssertCollection()
+  checkmate::assert_matrix(genotype_table, mode = "numeric", add = coll)
+  assert_genotype_table(genotype_table, add = coll)
   checkmate::assert_matrix(pheno_mut_effect, mode = "numeric",
-                           nrow = dim(geno_table)[2], add = coll)
+                           nrow = dim(genotype_table)[2], add = coll)
   checkmate::assert_numeric(pheno_wt, finite = T, any.missing = F, len = dim(pheno_mut_effect)[2],
                             null.ok = F, add = coll)
+  checkmate::reportAssertions(coll)
 
-  #### Compute fitness of all the genotypes from geno_table ####
+  #### Compute fitness of all the genotypes from genotype_table ####
   pheno_mut_effect_with_wt <- rbind(pheno_wt, pheno_mut_effect) #add the wt in the first row so that for each genotype the true phenotypic coordinates (i.e. phenotypic_effects + wt_coordinates) are returned and not only the sum of the phenotypic effects.
-  geno_table_with_wt <- cbind(array(1, dim = c(dim(geno_table)[1], 1), dimnames = list(NULL, "WT")), geno_table) #add a colum with 1 in every row for the "WT" (see also comment above) because every genotype share the WT background except for the mutation sites
-  pheno_genotype <- geno_table_with_wt %*% pheno_mut_effect_with_wt
-  ptof_fgm_iso(phenotype = pheno_genotype, maxfitness = maxfitness, alpha = alpha, Q = Q)
+  genotype_table_with_wt <- cbind(array(1, dim = c(dim(genotype_table)[1], 1), dimnames = list(NULL, "WT")), genotype_table) #add a colum with 1 in every row for the "WT" (see also comment above) because every genotype share the WT background except for the mutation sites
+  pheno_genotype <- genotype_table_with_wt %*% pheno_mut_effect_with_wt
+  ptof_fgm_iso(phenotype = pheno_genotype, maxfitness = maxfitness, alpha = alpha, Q = Q, pheno_opt = pheno_opt)
+}
+
+#' Function generating the fitness of the mutants' genotypes in \code{genotype_table}
+#' The mutants are produced by combining \code{nb_mut} random mutations generated
+#' from the wt with fitness \code{fitness_wt}. Fitnesses are computed using an
+#' isotropic FGM with the parameter \code{n}, \code{lambda}, \code{maxfitness},
+#' \code{alpha}, \code{Q}, \code{m}. See \code{\link{generate_random_mutation}}
+#' for more information on the random mutations and \code{\link{fitness_mutant_genotype}}
+#' for the fitness of the genotypes.
+#'
+#' @param fitness_wt A real number. Fitness of the wild type in the new environment.
+#' @inheritParams generate_random_mutation
+#' @inheritParams fitness_mutant_genotype
+#' @return A vector of real numbers. Each element is the fitness of the corresponding
+#' random mutants in \code{genotype_table}. They are in the same order as the rows of
+#' \code{genotype_table}.
+model_fgmrmut <- function(nb_mut, genotype_table, fitness_wt, n, lambda, maxfitness, alpha, Q, m) {
+  pheno_wt <- ftop_fgm_iso(fitness = fitness_wt, n = n, maxfitness = maxfitness,
+                           alpha = alpha, Q = Q)
+  pheno_mut_effect <- generate_random_mutation(nb_mut = nb_mut,
+                                               n = n,
+                                               lambda = lambda,
+                                               m = m)
+  fitness <- fitness_mutant_genotype(pheno_mut_effect = pheno_mut_effect,
+                                     pheno_wt = pheno_wt,
+                                     genotype_table = genotype_table,
+                                     maxfitness = maxfitness,
+                                     alpha = alpha,
+                                     Q = Q)
+  fitness
+}
+#' Function generating the fitness of the mutants' genotypes in \code{genotype_table}
+#' The mutants are produced by combining \code{nb_mut} selected mutations generated
+#' from the wt with fitness \code{fitness_wt}. Fitnesses are computed using an
+#' isotropic FGM with the parameter \code{n}, \code{lambda}, \code{maxfitness},
+#' \code{alpha}, \code{Q}, \code{m}. See \code{\link{generate_selected_mutation}}
+#' for more information on the selected mutations and \code{\link{fitness_mutant_genotype}}
+#' for the fitness of the genotypes.
+#'
+#' @param fitness_wt A real number. Fitness of the wild type in the new environment.
+#' @inheritParams generate_selected_mutation
+#' @inheritParams fitness_mutant_genotype
+#' @param fun_args List with a single element called nb_mut_rand. For more information
+#' see \code{\link{generate_selected_mutation}}
+#' @return A vector of real numbers. Each element is the fitness of the corresponding
+#' selected mutants in \code{genotype_table}. They are in the same order as the rows of
+#' \code{genotype_table}.
+model_fgmsmut <- function(nb_mut, genotype_table, fitness_wt, n, lambda, maxfitness, alpha, Q, m, fun_args) {
+  pheno_wt <- ftop_fgm_iso(fitness = fitness_wt,
+                           n = n, maxfitness = maxfitness, alpha = alpha, Q = Q)
+  pheno_mut_effect <- do.call(generate_selected_mutation, append(list(nb_mut = nb_mut,
+                                                                      n = n,
+                                                                      lambda = lambda,
+                                                                      maxfitness = maxfitness,
+                                                                      pheno_wt = pheno_wt,
+                                                                      alpha = alpha,
+                                                                      Q = Q,
+                                                                      m = m),
+                                                                 fun_args))
+
+  if(!anyNA(pheno_mut_effect)) {
+    fitness <- fitness_mutant_genotype(pheno_mut_effect = pheno_mut_effect,
+                                       pheno_wt = pheno_wt,
+                                       genotype_table = genotype_table,
+                                       maxfitness = maxfitness,
+                                       alpha = alpha,
+                                       Q = Q)
+  } else {
+    fitness <- array(dim = dim(genotype_table)[1])
+  }
+  fitness
+}
+#' Function generating the fitness of the mutants' genotypes in \code{genotype_table}
+#' The mutants are produced by combining \code{nb_mut} coselected mutations generated
+#' from the wt with fitness \code{fitness_wt}. Fitnesses are computed using an
+#' isotropic FGM with the parameter \code{n}, \code{lambda}, \code{maxfitness},
+#' \code{alpha}, \code{Q}, \code{m}. See \code{\link{generate_coselected_mutation}}
+#' for more information on the coselected mutations and \code{\link{fitness_mutant_genotype}}
+#' for the fitness of the genotypes.
+#'
+#' @param fitness_wt A real number. Fitness of the wild type in the new environment.
+#' @inheritParams generate_coselected_mutation
+#' @inheritParams fitness_mutant_genotype
+#' @param fun_args List with a single element called nb_mut_rand. For more information
+#' see \code{\link{generate_coselected_mutation}}
+#' @return A vector of real numbers. Each element is the fitness of the corresponding
+#' selected mutants in \code{genotype_table}. They are in the same order as the rows of
+#' \code{genotype_table}.
+model_fgmcsmut <- function(nb_mut, genotype_table, fitness_wt, n, lambda, maxfitness, alpha, Q, m, fun_args) {
+  pheno_wt <- ftop_fgm_iso(fitness = fitness_wt,
+                           n = n, maxfitness = maxfitness, alpha = alpha, Q = Q)
+  pheno_mut_effect <- do.call(generate_coselected_mutation, append(list(nb_mut = nb_mut,
+                                                                        n = n,
+                                                                        lambda = lambda,
+                                                                        maxfitness = maxfitness,
+                                                                        pheno_wt = pheno_wt,
+                                                                        alpha = alpha,
+                                                                        Q = Q,
+                                                                        m = m),
+                                                                   fun_args))
+
+  if(!anyNA(pheno_mut_effect)) {
+    fitness <- fitness_mutant_genotype(pheno_mut_effect = pheno_mut_effect,
+                                       pheno_wt = pheno_wt,
+                                       genotype_table = genotype_table,
+                                       maxfitness = maxfitness,
+                                       alpha = alpha,
+                                       Q = Q)
+  } else {
+    fitness <- array(dim = dim(genotype_table)[1])
+  }
+  fitness
+}
+#' Function generating the fitness of the mutants' genotypes in \code{genotype_table}
+#' in both the new and the reference environment. Mutants are produced by
+#' combining \code{nb_mut} random mutations generated from the wt with fitness
+#' \code{fitness_wt_ref} (in \code{fun_args}) in the reference environment.
+#' Fitnesses are computed using an isotropic FGM in two dimensions with the parameters
+#' passed to \code{fun_args}. See \code{\link{generate_random_mutation}}
+#' for more information on the random mutations. The fitness of the mutants in the
+#' new environment are then computed in a two (or one) dimensions isotropic FGM
+#' with the dimensions corresponding to the two (or the unique) first dimensions
+#' in which the mutants were generated in the environment of reference. For more
+#' informations on the positionning of the optimum of the new environment see
+#' \code{\link{pos_new_env}}. For more informations on the computation of fitness
+#' from phenotypes see \code{\link{fitness_mutant_genotype}}.
+#'
+#' @param fitness_wt_new_env A real number. Fitness of the wild type in the new environment.
+#' @inheritParams generate_random_mutation
+#' @inheritParams fitness_mutant_genotype
+#' @inheritParams pos_new_env
+#' @param fun_args List of parameters used to generate random mutants in the reference environment.
+#' Must take the form :
+#' fun_args = list(fitness_wt_ref = #, n_ref = #, lambda_ref = #, maxfitness_ref = #,
+#' alpha_ref = #, Q_ref = #, m_ref = #). For more information on these parameters, see
+#' the parameters in \code{\link{model_fgmrmut}}
+#' @return A vector of 2 * \code{nb_mut} real numbers. The elements from 1 to \code{nb_mut}
+#' are the fitnesses of the corresponding random mutants in \code{genotype_table}
+#' (in the same order as the rows) in the reference environment. The elements from
+#' \code{nb_mut} + 1 to 2 * \code{nb_mut} are the fitnesses of the same mutants
+#' (in the same order) in the new environment.
+model_fgmrmut_2env <- function(nb_mut, genotype_table, fitness_wt_new_env, lambda, maxfitness, alpha, Q, theta, fun_args) {
+
+  #### Generate fitness of random mutant in ref environment ####
+  pheno_wt_ref <- ftop_fgm_iso(fitness = fun_args$fitness_wt_ref,
+                               n = fun_args$n_ref, maxfitness = fun_args$maxfitness_ref, alpha = fun_args$alpha_ref, Q = fun_args$Q_ref)
+  pheno_mut_effect_ref <- generate_random_mutation(nb_mut = nb_mut,
+                                                   n = fun_args$n_ref,
+                                                   lambda = fun_args$lambda_ref,
+                                                   m = fun_args$m_ref)
+  fitness_ref <- fitness_mutant_genotype(pheno_mut_effect = pheno_mut_effect_ref,
+                                         pheno_wt = pheno_wt_ref,
+                                         genotype_table = genotype_table,
+                                         maxfitness = fun_args$maxfitness_ref,
+                                         alpha = fun_args$alpha_ref,
+                                         Q = fun_args$Q_ref)
+
+  #### Compute position of pheno_opt in new environment ####
+  pheno_opt_new <- pos_new_env(pheno_wt_ref = pheno_wt_ref, fitness_wt_new_env = fitness_wt_new_env,
+                               maxfitness = maxfitness, alpha = alpha, Q = Q, theta = theta)
+  #### Compute fitness of random mutant in new environment ####
+  lambda_I_n <- lambda * diag(2)
+  pheno_mut_effect_new <- sqrt(lambda / fun_args$lambda) * pheno_mut_effect_ref[, 1:2]
+  fitness_new_env<- fitness_mutant_genotype(pheno_mut_effect = pheno_mut_effect_new,
+                                            pheno_wt = pheno_wt_ref[, 1:2],
+                                            genotype_table = genotype_table,
+                                            maxfitness = maxfitness,
+                                            alpha = alpha,
+                                            Q = Q,
+                                            pheno_opt = pheno_opt_new)
+
+  c(fitness_ref, fitness_new_env)
+}
+#' Function generating the fitness of the mutants' genotypes in \code{genotype_table}
+#' in both the new and the reference environment. Mutants are produced by
+#' combining \code{nb_mut} selected mutations generated from the wt with fitness
+#' \code{fitness_wt_ref} (in \code{fun_args}) in the reference environment.
+#' Fitnesses are computed using an isotropic FGM in two dimensions with the parameters
+#' passed to \code{fun_args}. See \code{\link{generate_selected_mutation}}
+#' for more information on the selected mutations. The fitness of the mutants in the
+#' new environment are then computed in a two (or one) dimensions isotropic FGM
+#' with the dimensions corresponding to the two (or the unique) first dimensions
+#' in which the mutants were generated in the environment of reference. For more
+#' informations on the positionning of the optimum of the new environment see
+#' \code{\link{pos_new_env}}. For more informations on the computation of fitness
+#' from genotype see \code{\link{fitness_mutant_genotype}}.
+#'
+#' @param fitness_wt_new_env A real number. Fitness of the wild type in the new environment.
+#' @inheritParams generate_selected_mutation
+#' @inheritParams fitness_mutant_genotype
+#' @inheritParams pos_new_env
+#' @param fun_args List of parameters used to generate selected mutants in the reference environment.
+#' Must take the form :
+#' fun_args = list(fitness_wt_ref = #, n_ref = #, lambda_ref = #, maxfitness_ref = #,
+#' alpha_ref = #, Q_ref = #, m_ref = #). Can optionnaly take the element nb_mut_ran.
+#' For more information on these parameters, see the parameters in \code{\link{model_fgmsmut}}
+#' @return A vector of 2 * \code{nb_mut} real numbers. The elements from 1 to \code{nb_mut}
+#' are the fitnesses of the corresponding selected mutants in \code{genotype_table}
+#' (in the same order as the rows) in the reference environment. The elements from
+#' \code{nb_mut} + 1 to 2 * \code{nb_mut} are the fitnesses of the same mutants
+#' (in the same order) in the new environment.
+model_fgmsmut_2env <- function(nb_mut, genotype_table, fitness_wt_new_env, lambda, maxfitness, alpha, Q, theta, fun_args) {
+
+  #### Generate fitness of random mutant in ref environment ####
+  pheno_wt_ref <- ftop_fgm_iso(fitness = fun_args$fitness_wt_ref,
+                               n = fun_args$n_ref, maxfitness = fun_args$maxfitness_ref, alpha = fun_args$alpha_ref, Q = fun_args$Q_ref)
+  pheno_mut_effect_ref <- do.call(generate_selected_mutation, list(nb_mut = nb_mut,
+                                                                   n = fun_args$n_ref,
+                                                                   lambda = fun_args$lambda_ref,
+                                                                   maxfitness = fun_args$maxfitness_ref,
+                                                                   pheno_wt = pheno_wt_ref,
+                                                                   alpha = fun_args$alpha_ref,
+                                                                   Q = fun_args$Q_ref,
+                                                                   m = fun_args$m_ref,
+                                                                   nb_mut_rand = if ("nb_mut_rand" %in% names(fun_args)) {fun_args$nb_mut_rand} else {10^4}))
+
+  if(!anyNA(pheno_mut_effect_ref)) {
+    fitness_ref <- fitness_mutant_genotype(pheno_mut_effect = pheno_mut_effect_ref,
+                                           pheno_wt = pheno_wt_ref,
+                                           genotype_table = genotype_table,
+                                           maxfitness = fun_args$maxfitness_ref,
+                                           alpha = fun_args$alpha_ref,
+                                           Q = fun_args$Q_ref)
+
+    #### Compute position of pheno_opt in new environment ####
+    pheno_opt_new <- pos_new_env(pheno_wt_ref = pheno_wt_ref, fitness_wt_new_env = fitness_wt_new_env,
+                                 maxfitness = maxfitness, alpha = alpha, Q = Q, theta = theta)
+    #### Compute fitness of random mutant in new environment ####
+    lambda_I_n <- lambda * diag(2)
+    pheno_mut_effect_new <- sqrt(lambda / fun_args$lambda) * pheno_mut_effect_ref[, 1:2]
+    fitness_new_env<- fitness_mutant_genotype(pheno_mut_effect = pheno_mut_effect_new,
+                                              pheno_wt = pheno_wt_ref[, 1:2],
+                                              genotype_table = genotype_table,
+                                              maxfitness = maxfitness,
+                                              alpha = alpha,
+                                              Q = Q,
+                                              pheno_opt = pheno_opt_new)
+    all_fitness <- c(fitness_ref, fitness_new_env)
+  } else {
+    all_fitness <- array(dim = 2 * dim(genotype_table)[1])
+  }
+  all_fitness
+}
+#' Function generating the fitness of the mutants' genotypes in \code{genotype_table}
+#' in both the new and the reference environment. Mutants are produced by
+#' combining \code{nb_mut} coselected mutations generated from the wt with fitness
+#' \code{fitness_wt_ref} (in \code{fun_args}) in the reference environment.
+#' Fitnesses are computed using an isotropic FGM in two dimensions with the parameters
+#' passed to \code{fun_args}. See \code{\link{generate_coselected_mutation}}
+#' for more information on the coselected mutations. The fitness of the mutants in the
+#' new environment are then computed in a two (or one) dimensions isotropic FGM
+#' with the dimensions corresponding to the two (or the unique) first dimensions
+#' in which the mutants were generated in the environment of reference. For more
+#' informations on the positionning of the optimum of the new environment see
+#' \code{\link{pos_new_env}}. For more informations on the computation of fitness
+#' from genotype see \code{\link{fitness_mutant_genotype}}.
+#'
+#' @param fitness_wt_new_env A real number. Fitness of the wild type in the new environment.
+#' @inheritParams generate_selected_mutation
+#' @inheritParams fitness_mutant_genotype
+#' @inheritParams pos_new_env
+#' @param fun_args List of parameters used to generate coselected mutants in the reference environment.
+#' Must take the form :
+#' fun_args = list(fitness_wt_ref = #, n_ref = #, lambda_ref = #, maxfitness_ref = #,
+#' alpha_ref = #, Q_ref = #, m_ref = #). Can optionnaly take the element nb_mut_ran.
+#' For more information on these parameters, see the parameters in \code{\link{model_fgmcsmut}}
+#' @return A vector of 2 * \code{nb_mut} real numbers. The elements from 1 to \code{nb_mut}
+#' are the fitnesses of the corresponding coselected mutants in \code{genotype_table}
+#' (in the same order as the rows) in the reference environment. The elements from
+#' \code{nb_mut} + 1 to 2 * \code{nb_mut} are the fitnesses of the same mutants
+#' (in the same order) in the new environment.
+model_fgmcsmut_2env <- function(nb_mut, genotype_table, fitness_wt_new_env, lambda, maxfitness, alpha, Q, theta, fun_args) {
+
+  #### Generate fitness of random mutant in ref environment ####
+  pheno_wt_ref <- ftop_fgm_iso(fitness = fun_args$fitness_wt_ref,
+                               n = fun_args$n_ref, maxfitness = fun_args$maxfitness_ref, alpha = fun_args$alpha_ref, Q = fun_args$Q_ref)
+  pheno_mut_effect_ref <- do.call(generate_coselected_mutation, list(nb_mut = nb_mut,
+                                                                     n = fun_args$n_ref,
+                                                                     lambda = fun_args$lambda_ref,
+                                                                     maxfitness = fun_args$maxfitness_ref,
+                                                                     pheno_wt = pheno_wt_ref,
+                                                                     alpha = fun_args$alpha_ref,
+                                                                     Q = fun_args$Q_ref,
+                                                                     m = fun_args$m_ref,
+                                                                     nb_mut_rand = if ("nb_mut_rand" %in% names(fun_args)) {fun_args$nb_mut_rand} else {10^4}))
+  if(!anyNA(pheno_mut_effect_ref)) {
+    fitness_ref <- fitness_mutant_genotype(pheno_mut_effect = pheno_mut_effect_ref,
+                                           pheno_wt = pheno_wt_ref,
+                                           genotype_table = genotype_table,
+                                           maxfitness = fun_args$maxfitness_ref,
+                                           alpha = fun_args$alpha_ref,
+                                           Q = fun_args$Q_ref)
+
+    #### Compute position of pheno_opt in new environment ####
+    pheno_opt_new <- pos_new_env(pheno_wt_ref = pheno_wt_ref, fitness_wt_new_env = fitness_wt_new_env,
+                                 maxfitness = maxfitness, alpha = alpha, Q = Q, theta = theta)
+    #### Compute fitness of random mutant in new environment ####
+    lambda_I_n <- lambda * diag(2)
+    pheno_mut_effect_new <- sqrt(lambda / fun_args$lambda) * pheno_mut_effect_ref[, 1:2]
+    fitness_new_env<- fitness_mutant_genotype(pheno_mut_effect = pheno_mut_effect_new,
+                                              pheno_wt = pheno_wt_ref[, 1:2],
+                                              genotype_table = genotype_table,
+                                              maxfitness = maxfitness,
+                                              alpha = alpha,
+                                              Q = Q,
+                                              pheno_opt = pheno_opt_new)
+    all_fitness <- c(fitness_ref, fitness_new_env)
+  } else {
+    all_fitness <- array(dim = 2 * dim(genotype_table)[1])
+  }
+  all_fitness
+}
+#' Returns the coordinates of a new optimum in the plane corresponding to the
+#' first two dimensions of \code{pheno_wt_ref}. The position is computed using the
+#' inverse of the fitness function of an isotrope FGM on the \code{fitness_wt_new_env}.
+#'
+#' @param pheno_wt_ref A vector of real number. Phenotype of the wild type.
+#' @param fitness_wt_new_env A real number. Fitness of the wild type in the new
+#' env.
+#' @inheritParams ptof_fgm_iso
+#' @param theta A angle in radian between 0 and 2 * pi. Angle between the optimum
+#' of the environment of reference (first dimension of \code{pheno_wt_ref}), the
+#' \code{pheno_wt_ref} and the optimum of the new environement.
+#' @return A pair of coordinates for the position of the optimum of the new environment
+#' corresponding to the two first dimensions of \code{pheno_wt_ref}. If \code{pheno_wt_ref}
+#' has a single dimension, \code{theta} is ignored and the position of the
+#' optimum is given in this single dimension.
+pos_new_env <- function(pheno_wt_ref, fitness_wt_new_env, maxfitness, alpha = 1/2, Q = 2, theta) {
+
+  #### check arguments ####
+  arg_required <- c("pheno_wt_ref", "fitness_wt_new_env", "maxfitness", "alpha", "Q", "theta")
+  arg_passed <- names(as.list(match.call())[-1])
+  coll1 <- checkmate::makeAssertCollection()
+  if (!checkmate::test_subset(x = arg_required,
+                              choices = names(as.list(match.call())[-1]))) {
+    coll1$push(paste0("Missing values for ", paste(setdiff(arg_required, arg_passed), collapse=", ")))
+  }
+  checkmate::reportAssertions(coll1)
+  coll <- checkmate::makeAssertCollection()
+  checkmate::assert_numeric(pheno_wt_ref, finite = T, any.missing = F,
+                            null.ok = F, add = coll)
+  checkmate::assert_number(fitness_wt_new_env, na.ok = F, upper = maxfitness,
+                           finite = T, null.ok = F, add = coll)
+  checkmate::assert_number(maxfitness, na.ok = F, finite = T, null.ok = F,
+                           add = coll)
+  checkmate::assert_number(alpha, na.ok = F, lower = .Machine$double.eps,
+                           finite = T, null.ok = F, add = coll)
+  checkmate::assert_number(Q, na.ok = F, lower = .Machine$double.eps,
+                           finite = T, null.ok = F, add = coll)
+  checkmate::assert_number(theta, na.ok = F, lower = 0, upper = 360*pi/180,
+                           finite = T, null.ok = F, add = coll)
+  checkmate::reportAssertions(coll)
+
+  #### Compute position of pheno_opt in new environment ####
+  dist_to_new_opt <- (1 / alpha * (maxfitness - fitness_wt_new_env))^(1/Q)
+  pheno_opt_new <- numeric(2)
+  if (length(pheno_wt_ref) > 1) {
+    pheno_opt_new[1] <- pheno_wt_ref[1] + dist_to_new_opt * cos(theta) # coordinate of new env in dim 1
+    pheno_opt_new[2] <- pheno_wt_ref[2] + dist_to_new_opt * sin(theta) # coordinate of new env in dim 2
+  } else {
+    pheno_opt_new <- pheno_wt_ref + dist_to_new_opt
+  }
+  pheno_opt_new
 }

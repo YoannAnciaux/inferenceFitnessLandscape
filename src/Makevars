@@ -1,0 +1,42 @@
+# Modified from Makevars in package OncoSimulR/src/Makevars at : https://github.com/rdiaz02/OncoSimul/blob/master/OncoSimulR/src/Makevars
+CXX_STD = CXX11
+
+all: liblandscape.a fl_statistics fl_generate fl_draw $(SHLIB)
+
+MAGELLAN_SRC = magellan/gamma.c\
+      magellan/landscape.c \
+      magellan/random.c\
+      magellan/sort.c\
+      magellan/chain.c\
+      magellan/input.c\
+      magellan/common_drawings.c\
+      magellan/genotypes.c\
+      magellan/ordered_pairs.c\
+      magellan/calculus.c\
+      magellan/vector.c\
+      magellan/generalized_chain.c\
+      magellan/LinearAlgebra.c\
+      magellan/summary_statistics.c\
+      magellan/epistasis_type.c\
+      magellan/decomposition.c\
+      magellan/models.c
+MAGELLAN_OBJECTS = $(MAGELLAN_SRC:.c=.o)
+
+liblandscape.a: $(MAGELLAN_OBJECTS)
+	$(AR) -r $@ $+ ;
+	$(RANLIB) $@;
+
+MAGELLAN_LIBS = liblandscape.a
+MAGELLAN_LIBS_DIR = -L.
+MAGELLAN_LFLAGS = -llandscape
+MAGELLAN_INCLUDE_DIR = -I/magellan/.
+MAGELLAN_ALLCFLAGS= -O -Wall
+
+fl_statistics: magellan/main_fl_statistics.c $(MAGELLAN_LIBS)
+	$(CC) $(MAGELLAN_ALLCFLAGS) -o $@ $(MAGELLAN_INCLUDE_DIR) $(MAGELLAN_LIBS_DIR) $< $(MAGELLAN_LFLAGS) -lm;
+
+fl_generate: magellan/main_fl_generate.c $(MAGELLAN_LIBS)
+	$(CC) $(MAGELLAN_ALLCFLAGS) -o $@ $(MAGELLAN_INCLUDE_DIR) $(MAGELLAN_LIBS_DIR) $< $(MAGELLAN_LFLAGS) -lm;
+
+fl_draw: magellan/main_draw.c $(MAGELLAN_LIBS)
+	$(CC) $(MAGELLAN_ALLCFLAGS) -o $@ $(MAGELLAN_INCLUDE_DIR) $(MAGELLAN_LIBS_DIR) $< $(MAGELLAN_LFLAGS) -lm;

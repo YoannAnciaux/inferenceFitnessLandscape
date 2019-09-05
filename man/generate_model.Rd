@@ -30,6 +30,13 @@ models :
   \item{"fgmrmut2env"}{random mutation in isotropic FGM with a refence environment and a environment. See \code{\link{model_fgmrmut_2env}}}
   \item{"fgmsmut2env"}{selected mutation in isotropic FGM with a refence environment and a environment. See \code{\link{model_fgmsmut_2env}}}
   \item{"fgmcsmut2env"}{coselected mutation in isotropic FGM with a refence environment and a environment. See \code{\link{model_fgmcsmut_2env}}}
+  \item{"magellanFix"}{Fixed fitness for all genotypes. See \code{\link{model_Fix}}}
+  \item{"magellanMult"}{Additive effect of mutations. The fitnesses of all mutations are independent. See \code{\link{model_Mult}}}
+  \item{"magellanHoC"}{House of Card model. The fitnesses of all genotypes are iid. See \code{\link{model_HoC}}}
+  \item{"magellanNK"}{NK model from Kauffman et al. (1988). Each locus interacts with K other loci, that can be its neighbors or can be chosen randomly. Fitness are drawn in uniform [0,1]. See \code{\link{model_NK}}}
+  \item{"magellanIsing"}{all loci are arranged sequentially, and each locus interacts with its physical neighbors. The last and the first loci will interact only if 'c' is TRUE. For each pair of interacting loci, there is an associated cost if both alleles are not identical (and therefore 'compatible'). See \code{\link{model_Ising}}}
+  \item{"magellanEggBox"}{Each locus is either high or low fitness, with a systematic change between each neighbor. See \code{\link{model_EggBox}}}
+  \item{"magellanOptimum"}{Each mutated locus produces a contribution to the fitness according to a production (p,P or uniform) distribution and compared to an optimum with a (o,O or uniform) distribution. See \code{\link{model_EggBox}}}
 }}
 
 \item{fun_args}{List of argument for a given \code{model_type}.

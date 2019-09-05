@@ -22,6 +22,13 @@
 #'   \item{"fgmrmut2env"}{random mutation in isotropic FGM with a refence environment and a environment. See \code{\link{model_fgmrmut_2env}}}
 #'   \item{"fgmsmut2env"}{selected mutation in isotropic FGM with a refence environment and a environment. See \code{\link{model_fgmsmut_2env}}}
 #'   \item{"fgmcsmut2env"}{coselected mutation in isotropic FGM with a refence environment and a environment. See \code{\link{model_fgmcsmut_2env}}}
+#'   \item{"magellanFix"}{Fixed fitness for all genotypes. See \code{\link{model_Fix}}}
+#'   \item{"magellanMult"}{Additive effect of mutations. The fitnesses of all mutations are independent. See \code{\link{model_Mult}}}
+#'   \item{"magellanHoC"}{House of Card model. The fitnesses of all genotypes are iid. See \code{\link{model_HoC}}}
+#'   \item{"magellanNK"}{NK model from Kauffman et al. (1988). Each locus interacts with K other loci, that can be its neighbors or can be chosen randomly. Fitness are drawn in uniform [0,1]. See \code{\link{model_NK}}}
+#'   \item{"magellanIsing"}{all loci are arranged sequentially, and each locus interacts with its physical neighbors. The last and the first loci will interact only if 'c' is TRUE. For each pair of interacting loci, there is an associated cost if both alleles are not identical (and therefore 'compatible'). See \code{\link{model_Ising}}}
+#'   \item{"magellanEggBox"}{Each locus is either high or low fitness, with a systematic change between each neighbor. See \code{\link{model_EggBox}}}
+#'   \item{"magellanOptimum"}{Each mutated locus produces a contribution to the fitness according to a production (p,P or uniform) distribution and compared to an optimum with a (o,O or uniform) distribution. See \code{\link{model_EggBox}}}
 #' }
 #' @param fun_args List of argument for a given \code{model_type}.
 #' Argument *_ref are mandatory parameters for the environment of reference in models with two environments
@@ -83,14 +90,14 @@ generate_model <- function(empirical_fl, model_type, fun_args = list(), ...) {
                           add = coll)
   }
   checkmate::assert_choice(model_type, choices = c("fgmrmut", "fgmsmut", "fgmcsmut",
-                                                   "fgmrmut2env", "fgmsmut2env", "fgmcsmut2env"),
+                                                   "fgmrmut2env", "fgmsmut2env", "fgmcsmut2env",
+                                                   "magellanFix", "magellanMult", "magellanHoC", "magellanNK", "magellanIsing", "magellanEggBox", "magellanOptimum"),
                            add = coll)
   #when adding new models check all the values from the two following assertions
   checkmate::assert_list(fun_args, any.missing = F, max.len = 8, names = "unique",
                          null.ok = F, add = coll)
 
   switch (model_type,
-          "fgmrmut" = checkmate::assert_list(fun_args, len = 0, add = coll),
           "fgmsmut" = checkmate::assert_subset(names(fun_args), choices = c("nb_mut_rand"), add = coll),
           "fgmcsmut" = checkmate::assert_subset(names(fun_args), choices = c("nb_mut_rand"), add = coll),
           "fgmrmut2env" = checkmate::assert_subset(names(fun_args),
@@ -106,49 +113,80 @@ generate_model <- function(empirical_fl, model_type, fun_args = list(), ...) {
   checkmate::reportAssertions(coll)
   nb_mut <- dim(empirical_fl)[2]-1
   genotype_table <- empirical_fl[, -(nb_mut + 1)]
+  fitness_wt <- empirical_fl[which(rowSums(genotype_table) == 0), nb_mut + 1]
+  # file path to rhe binary fl_generate (from MAGELLAN) in the package directory
+  path2_fl_generate <- system.file("bin", "fl_generate", package = "inferenceFitnessLandscape")
 
   switch (model_type,
           # FGM random mutation 1 environment
           "fgmrmut" = function(n, lambda, maxfitness, alpha, Q, m) {
             model_fgmrmut(nb_mut = nb_mut, genotype_table = genotype_table,
-                          fitness_wt = empirical_fl[which(rowSums(genotype_table) == 0), nb_mut + 1],
+                          fitness_wt =fitness_wt,
                           n = n, lambda = lambda, maxfitness = maxfitness,
                           alpha = alpha, Q = Q, m = m)
           },
           # FGM selected mutation 1 environment
           "fgmsmut" = function(n, lambda, maxfitness, alpha, Q, m) {
             model_fgmsmut(nb_mut = nb_mut, genotype_table = genotype_table,
-                          fitness_wt = empirical_fl[which(rowSums(genotype_table) == 0), nb_mut + 1],
+                          fitness_wt =fitness_wt,
                           n = n, lambda = lambda, maxfitness = maxfitness,
                           alpha = alpha, Q = Q, m = m, fun_args = fun_args)
           },
           # FGM coselected mutation 1 environment
           "fgmcsmut" = function(n, lambda, maxfitness, alpha, Q, m) {
             model_fgmcsmut(nb_mut = nb_mut, genotype_table = genotype_table,
-                           fitness_wt = empirical_fl[which(rowSums(genotype_table) == 0), nb_mut + 1],
+                           fitness_wt =fitness_wt,
                            n = n, lambda = lambda, maxfitness = maxfitness,
                            alpha = alpha, Q = Q, m = m, fun_args = fun_args)
           },
           # FGM random mutation 2 environments
           "fgmrmut2env" = function(lambda, maxfitness, alpha, Q, theta) {
             model_fgmrmut_2env(nb_mut = nb_mut, genotype_table = genotype_table,
-                               fitness_wt_new_env = empirical_fl[which(rowSums(genotype_table) == 0), nb_mut + 1],
+                               fitness_wt_new_env =fitness_wt,
                                lambda = lambda, maxfitness = maxfitness,
                                alpha = alpha, Q = Q, theta = theta, fun_args = fun_args)
           },
           # FGM selected mutation 2 environments
           "fgmsmut2env" = function(lambda, maxfitness, alpha, Q, theta) {
             model_fgmsmut_2env(nb_mut = nb_mut, genotype_table = genotype_table,
-                               fitness_wt_new_env = empirical_fl[which(rowSums(genotype_table) == 0), nb_mut + 1],
-                                lambda = lambda, maxfitness = maxfitness,
-                                alpha = alpha, Q = Q, theta = theta, fun_args = fun_args)
+                               fitness_wt_new_env =fitness_wt,
+                               lambda = lambda, maxfitness = maxfitness,
+                               alpha = alpha, Q = Q, theta = theta, fun_args = fun_args)
           },
           # FGM coselected mutation 2 environments
           "fgmcsmut2env" = function(lambda, maxfitness, alpha, Q, theta) {
             model_fgmcsmut_2env(nb_mut = nb_mut, genotype_table = genotype_table,
-                                fitness_wt_new_env = empirical_fl[which(rowSums(genotype_table) == 0), nb_mut + 1],
+                                fitness_wt_new_env =fitness_wt,
                                 lambda = lambda, maxfitness = maxfitness,
                                 alpha = alpha, Q = Q, theta = theta, fun_args = fun_args)
+          },
+          "magellanFix" = function(f) {
+            model_Fix(nb_mut = nb_mut, genotype_table = genotype_table, fitness_wt = fitness_wt,
+                      f = f, path2_fl_generate = path2_fl_generate)
+          },
+          "magellanMult" = function(s, S, d) {
+            model_Mult(nb_mut = nb_mut, genotype_table = genotype_table, fitness_wt = fitness_wt,
+                       s = s, S = S, d = d, path2_fl_generate = path2_fl_generate)
+          },
+          "magellanHoC" = function(H) {
+            model_HoC(nb_mut = nb_mut, genotype_table = genotype_table, fitness_wt = fitness_wt,
+                      H = H, path2_fl_generate = path2_fl_generate)
+          },
+          "magellanNK" = function(K, r) {
+            model_NK(nb_mut = nb_mut, genotype_table = genotype_table, fitness_wt = fitness_wt,
+                     K = K, r = r, path2_fl_generate = path2_fl_generate)
+          },
+          "magellanIsing" = function(i, I, c) {
+            model_Ising(nb_mut = nb_mut, genotype_table = genotype_table, fitness_wt = fitness_wt,
+                        i = i, I = I, c = c, path2_fl_generate = path2_fl_generate)
+          },
+          "magellanEggBox" = function(e, E) {
+            model_EggBox(nb_mut = nb_mut, genotype_table = genotype_table, fitness_wt = fitness_wt,
+                         e = e, E = E, path2_fl_generate = path2_fl_generate)
+          },
+          "magellanOptimum" = function(o, O, p, P) {
+            model_Optimum(nb_mut = nb_mut, genotype_table = genotype_table, fitness_wt = fitness_wt,
+                          o = o, O = O, p = p, P = P, path2_fl_generate = path2_fl_generate)
           }
 
   )

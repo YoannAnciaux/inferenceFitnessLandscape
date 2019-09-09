@@ -1,7 +1,6 @@
 ---
 title: "Inference of properties of fitness landscapes from empirical fitness landscapes"
 author: "Yoann Anciaux"
-date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Inference of properties of fitness landscapes from empirical fitness landscapes}

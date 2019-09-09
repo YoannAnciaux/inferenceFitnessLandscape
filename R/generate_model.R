@@ -80,7 +80,7 @@ generate_model <- function(empirical_fl, model_type, fun_args = list(), ...) {
   if (is.character(empirical_fl)) {
     checkmate::assert_file_exists(empirical_fl, access = "r", add = coll)
     if (checkmate::test_file_exists(empirical_fl, access = "r")) {
-      empirical_fl <- utils::read.table(file = empirical_fl, ...)
+      empirical_fl <- as.matrix(unname(utils::read.table(file = empirical_fl, ...)))
     }
   }
   checkmate::assert_matrix(empirical_fl, mode = "numeric", add = coll)

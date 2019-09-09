@@ -4,7 +4,7 @@ inferenceFitnessLandscape
 =========================
 
 <!-- badges: start -->
-[![Travis-CI build status](https://travis-ci.com/YoannAnciaux/inferenceFitnessLandscape.svg?branch=master)](https://travis-ci.com/YoannAnciaux/inferenceFitnessLandscape) [![codecov](https://codecov.io/gh/YoannAnciaux/inferenceFitnessLandscape/branch/master/graph/badge.svg)](https://codecov.io/gh/YoannAnciaux/inferenceFitnessLandscape) <!-- badges: end -->
+[![Travis-CI build status](https://travis-ci.com/YoannAnciaux/inferenceFitnessLandscape.svg?branch=master)](https://travis-ci.com/YoannAnciaux/inferenceFitnessLandscape) [![codecov](https://codecov.io/gh/YoannAnciaux/inferenceFitnessLandscape/branch/master/graph/badge.svg)](https://codecov.io/gh/YoannAnciaux/inferenceFitnessLandscape) [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/YoannAnciaux/inferenceFitnessLandscape?branch=master&svg=true)](https://ci.appveyor.com/project/YoannAnciaux/inferenceFitnessLandscape) <!-- badges: end -->
 
 The goal of inferenceFitnessLandscape is to ...
 

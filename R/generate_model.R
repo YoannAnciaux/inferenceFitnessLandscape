@@ -207,10 +207,9 @@ assert_genotype_table <- function(x, .var.name = checkmate::vname(x), add = NULL
 #' @inheritParams assert_genotype_table
 #' @return TRUE or an error message.
 check_genotype_table <- function(x) {
-  x2 <- as.matrix(expand.grid(rep(list(0:1), dim(x)[2])))
-  res <- identical(as.logical(duplicated(rbind(x, x2))), c(logical(dim(x)[1]), !logical(dim(x)[1])))
+  res <- length(which( x != 0 & x != 1)) == 0
   if (res) {return(TRUE)} else {
-    return(paste0("The rows must contains the ", 2^dim(x)[2], " combinations of the ", dim(x)[2], " column(s) in a 0/1 format"))
+    return(paste0("The rows must only contains combinations of the ", dim(x)[2], " column(s) in a 0/1 format"))
   }
 }
 

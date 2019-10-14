@@ -1,8 +1,6 @@
 test_that("'check_genotype_table' of genotype_table of the 8 combinations of 3 mutants with an error returns an error message", {
-  x <- as.matrix(expand.grid(rep(list(0:1), 3)))
-  x <- x[sample(1:dim(x)[1]),]
-  x[1,1] <- 8
-  expect_equal(check_genotype_table(x), "The rows must contains the 8 combinations of the 3 column(s) in a 0/1 format")
+  x <- as.matrix(expand.grid(rep(list(0:2), 3)))
+  expect_equal(check_genotype_table(x), "The rows must only contains combinations of the 3 column(s) in a 0/1 format")
 })
 test_that("'check_genotype_table' of genotype_table of the 8 combinations of 3 mutants returns TRUE", {
   x <- as.matrix(expand.grid(rep(list(0:1), 3)))
@@ -28,6 +26,18 @@ test_that("'generate_model' of 'fgmrmut' returns the expected number of random m
   r <- t(3, 0.1, 1, 1/2, 2, 3)
   checkmate::expect_numeric(r, finite = T, any.missing = F, len = dim(empirical_fl)[1], null.ok = F)
   expect_equal(r[1], empirical_fl[1, dim(empirical_fl)[2]])
+})
+test_that("'generate_model' of 'fgmrmut' returns the expected fitnesses of single mutants",{
+  empirical_fl <- cbind(rbind(numeric(3), diag(nrow = 3, ncol = 3)), seq(0, 0.3, 0.1)) # unname(cbind(as.matrix(expand.grid(rep(list(0:1), 3))), seq(0.1, 0.8, 0.1)))
+  model <- generate_model(empirical_fl = empirical_fl, model_type = "fgmrmut")
+  set.seed(1)
+  test <- round(model(3, 0.1, 1, 1/2, 2, 3), digits = 6)
+  lambda_I_n <- 0.1 * diag(3)
+  set.seed(1)
+  A = MASS::mvrnorm(n = 3, mu = numeric(3), Sigma = lambda_I_n)
+  expected <- round(ptof_fgm_iso(t(A) + matrix(ftop_fgm_iso(0, 3, 1), 3,3, byrow = T),
+                                 1, 1/2, 2), digits = 6)
+  expect_equal(test[2:4], expected)
 })
 test_that("'generate_model' of 'fgmsmut' returns the expected number of selected mutants and the wt",{
   empirical_fl <- unname(cbind(as.matrix(expand.grid(rep(list(0:1), 3))), seq(0.1, 0.8, 0.1)))
@@ -85,14 +95,14 @@ test_that("'generate_model' of 'fgmsmut2env' returns the expected fitnesses of s
   pheno_wt_ref <- ftop_fgm_iso(fitness = fun_args$fitness_wt_ref,
                                n = fun_args$n_ref, maxfitness = fun_args$maxfitness_ref, alpha = fun_args$alpha_ref, Q = fun_args$Q_ref)
   set.seed(1); pheno_mut_effect <- do.call(generate_selected_mutation, list(nb_mut = 3,
-                                                                                n = fun_args$n_ref,
-                                                                                lambda = fun_args$lambda_ref,
-                                                                                maxfitness = fun_args$maxfitness_ref,
-                                                                                pheno_wt = pheno_wt_ref,
-                                                                                alpha = fun_args$alpha_ref,
-                                                                                Q = fun_args$Q_ref,
-                                                                                m = fun_args$m_ref,
-                                                                                nb_mut_rand = fun_args$nb_mut_rand))
+                                                                            n = fun_args$n_ref,
+                                                                            lambda = fun_args$lambda_ref,
+                                                                            maxfitness = fun_args$maxfitness_ref,
+                                                                            pheno_wt = pheno_wt_ref,
+                                                                            alpha = fun_args$alpha_ref,
+                                                                            Q = fun_args$Q_ref,
+                                                                            m = fun_args$m_ref,
+                                                                            nb_mut_rand = fun_args$nb_mut_rand))
   target <- fitness_mutant_genotype(pheno_mut_effect, pheno_wt_ref, genotype_table, maxfitness, alpha, Q, pheno_opt = c(cos(theta), sin(theta)) * (1 / alpha * (maxfitness-empirical_fl[1,4]))^(1/Q) + pheno_wt_ref)
   #### current ####
   t <- generate_model(empirical_fl = empirical_fl, model_type = "fgmsmut2env",
@@ -116,14 +126,14 @@ test_that("'generate_model' of 'fgmcsmut2env' returns the expected fitnesses of 
   pheno_wt_ref <- ftop_fgm_iso(fitness = fun_args$fitness_wt_ref,
                                n = fun_args$n_ref, maxfitness = fun_args$maxfitness_ref, alpha = fun_args$alpha_ref, Q = fun_args$Q_ref)
   set.seed(1); pheno_mut_effect <- do.call(generate_coselected_mutation, list(nb_mut = 3,
-                                                                            n = fun_args$n_ref,
-                                                                            lambda = fun_args$lambda_ref,
-                                                                            maxfitness = fun_args$maxfitness_ref,
-                                                                            pheno_wt = pheno_wt_ref,
-                                                                            alpha = fun_args$alpha_ref,
-                                                                            Q = fun_args$Q_ref,
-                                                                            m = fun_args$m_ref,
-                                                                            nb_mut_rand = fun_args$nb_mut_rand))
+                                                                              n = fun_args$n_ref,
+                                                                              lambda = fun_args$lambda_ref,
+                                                                              maxfitness = fun_args$maxfitness_ref,
+                                                                              pheno_wt = pheno_wt_ref,
+                                                                              alpha = fun_args$alpha_ref,
+                                                                              Q = fun_args$Q_ref,
+                                                                              m = fun_args$m_ref,
+                                                                              nb_mut_rand = fun_args$nb_mut_rand))
   target <- fitness_mutant_genotype(pheno_mut_effect, pheno_wt_ref, genotype_table, maxfitness, alpha, Q, pheno_opt = c(cos(theta), sin(theta)) * (1 / alpha * (maxfitness-empirical_fl[1,4]))^(1/Q) + pheno_wt_ref)
   #### current ####
   t <- generate_model(empirical_fl = empirical_fl, model_type = "fgmcsmut2env",
